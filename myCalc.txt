@@ -1,0 +1,60 @@
+#!/bin/bash
+# calculrator (Final Exam)
+# 12/18/2020
+# written by Yoonseon LEE
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# source myFunctions
+#--------------------------------------------------------------------------
+. $HOME/final-exam/myFunctions
+
+clear
+echo "Welcome to my calculrator."
+
+# ----------------------
+# main routine
+# check two input values are available
+# display menu using select statement
+# check two input values are number, otherwise display erroe mesage
+#----------------------
+while true
+        do
+        read -p "Enter two numbers: " arg1 arg2
+        if [ -z $arg1 ] || [ -z $arg2 ]
+        then
+                echo "Two numbers needed. Try again"
+        else
+                check_args $arg1 $arg2
+
+                PS3=$'\e[1;32m'"My Calculrator>  "$'\e[m'
+                echo
+                select choice in Add Subtract Multiply Divide Exit
+                do
+                        case $choice in
+                        "Add")
+                                add_func $arg1 $arg2
+                                ;;
+                        "Subtract")
+                                subtract_func $arg1 $arg2
+                                ;;
+                        "Multiply")
+                                mult_func $arg1 $arg2
+                                ;;
+                        "Divide")
+                                divide_func $arg1 $arg2
+                                ;;
+                        "Exit")
+                                echo "Exiting Calculrator"
+                                echo
+                                exit
+                                ;;
+                        *)
+                                echo "Not a valid option"
+                                ;;
+                        esac
+                done
+        fi
+done
+
+

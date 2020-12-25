@@ -1,0 +1,28 @@
+#############################################################################
+#!/bin/bash
+#
+# This script uses functions from $HOME/Scripts/myfunctions
+#
+#############################################################################
+
+#---------------------------------------------------------------------------#
+# source myfunctions and set backup directory
+# if the user wants to backup or compress, call menu from myfunctions
+#---------------------------------------------------------------------------#
+. $HOME/script/myfunctions
+BACKUP_DIR="$HOME/.secret/.backup"
+
+clear
+echo "Welcome to version 2.0 of my backup script"
+echo "This program backs up to the Cloud"
+
+echo "......doing cloud stuff"
+
+read -p "would you like to back up your local directories [yes|y]? " ans
+if [ $ans = "yes" ] || [ $ans = "y" ]
+then
+        menu
+else
+        echo "Thanks for using my script"
+fi
+

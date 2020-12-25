@@ -1,0 +1,69 @@
+#-----------------------------------------------------------------------------#
+# Functions for calculrator (Final Exam)
+# 12/18/2020
+# written by Yoonseon Lee
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+# check each argument is a number
+#------------------------------------------------------------------------------
+check_args() {
+        num1=$1
+        num2=$2
+
+        if [ "$num1" -ge 0 ] 2> /dev/null || [ "$num1" -lt 0 ] 2> /dev/null
+        then
+                echo -n
+        else
+                echo "$num1 is not a number"
+                continue
+        fi
+
+
+        if [ "$num2" -ge 0 ] 2> /dev/null || [ "$num2" -lt 0 ] 2> /dev/null
+        then
+                echo -n
+        else
+                echo "$num2 is not a number"
+                continue
+        fi
+
+}
+
+add_func() {
+        num1=$1
+        num2=$2
+        (( result = $num1 + $num2 ))
+        echo "$num1 + $num2 = $result"
+}
+
+subtract_func() {
+        num1=$1
+        num2=$2
+        (( result = $num1 - $num2 ))
+        echo "$num1 - $num2 = $result"
+}
+mult_func() {
+        num1=$1
+        num2=$2
+        (( result = $num1 * $num2 ))
+        echo "$num1 * $num2 = $result"
+}
+#------------------------------------------------------------------------------#
+# divide function
+#       use bc for floating point
+#       check denominator is zero
+#------------------------------------------------------------------------------#
+divide_func() {
+        num1=$1
+        num2=$2
+        if [ $num2 = 0 ]
+        then
+                echo "Undefined. Can't be divided by zero"
+                break
+        fi
+        result=$(echo "scale=3; $num1 / $num2" | bc)
+        echo "$num1 / $num2 = $result"
+}
+
+

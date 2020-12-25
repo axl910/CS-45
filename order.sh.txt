@@ -1,0 +1,100 @@
+#!/bin/bash
+# Order.sh script that lets you order from a menu.
+# Written by: hc
+# Date: 12/12/2020
+#
+# Improve this script for extra credit ...
+# colors for prompts,...display main menu when you return...add functions for different component
+# I'll leave it up to  you to be creative...have fun with it.
+#
+#
+#---------------------------------------------------------------
+# Add color : green for main menu and yellow for dessert
+#		$'\e[1;32m'
+#		$'\e[m'
+# display main menu when return
+# calculrate order total
+# 12/15/2020 by Yoonseon Lee -----------------------------------
+
+MAIN_PROMPT=$'\e[1;32m'"Main Menu: What would you like to order? "$'\e[m'
+DESSERT_PROMPT=$'\e[1;33m'"Choose your dessert: "$'\e[m'
+
+PS3=$MAIN_PROMPT
+
+total=0.00
+clear
+
+select order in "Thai chicken" ribs turkey "lamb chops" dessert "Order Completed"
+do
+        case $order in
+        "Thai chicken")
+                echo 'Thai chicken with rice and salad is : $13.99'
+                echo
+                total=$(echo "scale=2; $total + 13.99" | bc)
+                ;;
+        "ribs") echo 'Ribs with potato on side is : $17:99'
+                echo
+                total=$(echo "scale=2; $total + 17.99" | bc)
+                ;;
+        "turkey")
+                echo 'Turkey on rye is: $12.99'
+                echo
+                total=$(echo "scale=2; $total + 12.99" | bc)
+                ;;
+        "lamb chops")
+                echo 'Lamb chops and fried potatoes is: $18.99'
+                echo
+                total=$(echo "scale=2; $total + 18.99" | bc)
+                ;;
+        "dessert")
+                PS3=$DESSERT_PROMPT
+                select dessert in "apple pie" "cheese cake" "Ice Cream" "No Dessert"
+                do
+                        case $dessert in
+                        "apple pie")
+                                echo 'Freshly baked pie is : $3.95'
+                                total=$(echo "scale=2; $total + 3.99" | bc)
+                                break
+                                ;;
+                        "cheese cake")
+                                echo 'Sweet cheese cake is : $8.00'
+                                total=$(echo "scale=2; $total + 8.00" | bc)
+                                break
+                                ;;
+                        "Ice Cream")
+                                echo 'Strawberry is the only flavor: $2.99'
+                                total=$(echo "scale=2; $total + 2.99" | bc)
+                                break
+                                ;;
+                        "No Dessert")
+                                echo 'Going back to main menu'
+                                break
+                                ;;
+
+                        *) echo "Not a choice for dessert."
+                                ;;
+                        esac
+                done
+                echo
+# show dummy select
+                PS3=""
+                echo 1 | select dummy in "Thai chicken" ribs turkey "lamb chops" dessert "Order Completed"
+                do
+                        break
+                done
+                PS3=$MAIN_PROMPT
+                ;;
+        "Order Completed")
+                break
+                ;;
+        *) echo "Not a valid choice."
+                ;;
+
+        esac
+done
+
+echo ""
+echo "Your total is \$$total"
+echo "Thank you for coming."
+echo "Enjoy your meal. ':)'"
+

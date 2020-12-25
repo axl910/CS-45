@@ -1,0 +1,189 @@
+###############################################################################
+# This is my functions file
+#
+#
+# Using a Here document in this script for the menu.
+# date: 12-03-20
+# written by Yoonseon Lee
+###############################################################################
+
+#-----------------------------------------------------------------------------#
+#  print menu on the screen and read user's input
+#-----------------------------------------------------------------------------#
+menu() {
+clear
+print_menu
+read_input
+
+}
+
+#-----------------------------------------------------------------------------#
+#  print backup and compress menu on screen
+#-----------------------------------------------------------------------------#
+print_menu() {
+cat <<END
+-------------------------------------
+                MENU
+-------------------------------------
+        1. Backup
+        2. Compress
+        3. Compress and Backup
+        4. Quit Menu
+-------------------------------------
+END
+}
+
+#-----------------------------------------------------------------------------#
+#  Backup function
+#       backup a directory using tar
+#       if the user wants to compress, compress the tar file using gzip
+#       (if the compressed file exists, overwrite it with option -f )
+#       the file name consists of directory name and current date
+#               $(basename $b_dir)-$(date +%m-%d-%y).tar
+#               $(basename $b_dir)-$(date +%m-%d-%y).tar.gz
+#-----------------------------------------------------------------------------#
+backup_func(){
+        echo "I am doing a backup"
+        read_dir
+        tar -cvf $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y).tar $b_dir &> /dev/null
+
+        if [ $? = 0 ]
+        then
+                echo "$b_dir backup has done"
+                read -p "Do you want to compress? " c_ans
+                if [ $c_ans = "yes" ] || [ $c_ans = "y" ]
+                        then
+                        gzip -f $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y).tar > /dev/null
+                        if [ $? = 0 ]
+                        then
+                                echo "$b_dir compression has done"
+                        else
+                                echo "Error occurs while compression"
+                        fi
+                fi
+                print_menu
+        else
+                echo "Error occurs while backup"
+        fi
+}
+
+#-----------------------------------------------------------------------------#
+#  Compress Function
+#       1. make a directory under BACKUP_DIR
+#          a new directory name is $(basename $b_dir)-$(date +%m-%d-%y)
+#       if the same directory exists, ask if the user wants to delete old data
+#       if the user doesn't want to delete old data, quit compress function
+#       2. copy all files to the new directory
+#       3. compress all files in the new directory
+#-----------------------------------------------------------------------------#
+compress_func() {
+        echo "I am compressing"
+        read_dir
+        if [ -d $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y) ]
+        then
+                echo "Compressed data exists"
+                read -p "Do you want to delete old data? " com_ans
+                if [ $com_ans = "yes" ] || [ $com_ans = "y" ]
+                then
+                        rm -r $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y)
+                        echo "Old compressed data deleted"
+                else
+                        echo "$b_dir compression hasn't done. Exit compress"
+                        print_menu
+                        continue
+                fi
+        fi
+
+        mkdir $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y)
+        chmod 700 $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y)
+        cp $b_dir/* $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y) 2> /dev/null
+
+        gzip $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y)/*
+        if [ $? = 0 ]
+        then
+                echo "$b_dir compression has done"
+                print_menu
+        else
+                echo "Error occurs while compression"
+        fi
+}
+
+#-----------------------------------------------------------------------------#
+#  Backup and Compress Function
+#       backup and compress the directory using tar and gzip,
+#       save it to BACKUP_DIR ($HOME/.secret/.backup)
+#       if the compressed file exists, overwrite it
+#       the file name consists of directory name and current date
+#               $(basename $b_dir)-$(date +%m-%d-%y).tar
+#               $(basename $b_dir)-$(date +%m-%d-%y).tar.gz
+#-----------------------------------------------------------------------------#
+compress_and_backup_func() {
+        echo "I am compressing and backing up"
+        read_dir
+        tar -cvf $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y).tar $b_dir &> /dev/null
+
+        if [ $? = 0 ]
+        then
+                gzip -f $BACKUP_DIR/$(basename $b_dir)-$(date +%m-%d-%y).tar > /dev/null
+                if [ $? = 0 ]
+                then
+                        echo "$b_dir Backup and Compression have done"
+                        print_menu
+                else
+                        echo "Error occurs while compression"
+                fi
+        else
+                echo "Error occurs while backup"
+        fi
+}
+
+#-----------------------------------------------------------------------------#
+#  Read Directory function
+#       read the directory name to backup or compress
+#       if the directory doesn't exists, print error message and read it again
+#-----------------------------------------------------------------------------#
+read_dir() {
+
+while true
+do
+        read -p "Please enter the directory name to backup or compress: " b_dir
+        if  [  -d $b_dir ]
+        then
+                break
+        else
+                echo "Incorrect directory name. Please try again"
+        fi
+done
+}
+
+#-----------------------------------------------------------------------------#
+#  Read user's input after print menu
+#
+#-----------------------------------------------------------------------------#
+function read_input
+{
+        while true
+        do
+                read -p "Please select a number to continue: " choice
+
+                case $choice in
+                        1|1.|backup|Backup)
+                                backup_func
+                                ;;
+                        2|2.|Compress|compress)
+                                compress_func
+                                ;;
+                        3|3.|'Compress and backup')
+                                compress_and_backup_func
+                                ;;
+                        4|4.|Quit|quit|'Quit menu')
+                                echo "Exiting program."
+                                exit 5
+                                ;;
+                        *)
+                                echo "Sorry not a valid option."
+                                echo "Please try again."
+                                ;;
+                esac
+        done
+}
